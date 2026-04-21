@@ -60,6 +60,11 @@ def run(
         default=existing.get("deadline", ""),
     )
 
+    visualizer_path = Prompt.ask(
+        "[cyan]Visualizer path[/cyan] (optional, e.g. ~/IMC_P4_Visualizer)",
+        default=existing.get("visualizer_path", ""),
+    )
+
     data = {"email": email, "password": password}
     if deadline.strip():
         try:
@@ -68,6 +73,16 @@ def run(
             rprint("[red]Error:[/red] Deadline must be in YYYY-MM-DD HH:MM format.")
             raise typer.Exit(1)
         data["deadline"] = deadline.strip()
+
+    if visualizer_path.strip():
+        path = Path(visualizer_path.strip()).expanduser()
+        if not path.exists():
+            rprint("[red]Error:[/red] Visualizer path does not exist.")
+            raise typer.Exit(1)
+        if not (path / "package.json").exists():
+            rprint("[red]Error:[/red] No package.json found in visualizer path.")
+            raise typer.Exit(1)
+        data["visualizer_path"] = str(path)
 
     save(data)
     rprint("[green]✓[/green] Config saved.")
