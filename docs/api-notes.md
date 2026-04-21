@@ -1,47 +1,45 @@
 # IMC Prosperity API Notes
 
-## Attempted Discovery
+## Auth — AWS Cognito SRP
 
-Automated probing returned 404s for all standard endpoints:
-- `/api/auth/login`, `/api/login`, `/api/user/login`
-- `/api/auth/signin`, `/api/v1/login`
-- `/auth/login`, `/login`
+- **User Pool ID**: `eu-west-1_wKiTmHXUE`
+- **Client ID**: `5kgp0jm69aeb91paqj1hnps838`
+- **Region**: `eu-west-1`
+- Flow: `USER_SRP_AUTH` → `PASSWORD_VERIFIER` challenge (handled by `pycognito`)
+- Returns: `id_token` (JWT, 1hr expiry), `refresh_token`
 
-The site uses Next.js App Router (evidenced by `x-nextjs-prerender`, `Vary: rsc` headers).
+## API Base URL
 
-## Requested: Manual API Capture
+```
+https://3dzqiahkw1.execute-api.eu-west-1.amazonaws.com/prod
+```
 
-Please capture API calls using browser DevTools:
+All requests: `Authorization: Bearer {id_token}`
 
-1. Go to https://prosperity.imc.com
-2. Open DevTools (F12) → Network tab
-3. Login with credentials:
-   - Email: `rkothari40@gatech.edu`
-   - Password: `Internships_123$`
-4. After logging in, make a submission (if possible)
-5. Right-click requests → "Copy as cURL"
-6. Share the cURL commands
+## Endpoints
 
-Key endpoints to find:
-- Authentication (login) endpoint + request/response format
-- Algorithm submission endpoint
-- Status polling endpoint  
-- Log download endpoint
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/rounds` | List rounds; find active round |
+| GET | `/submissions/algo/{roundId}?page=1&pageSize=50` | List submissions for round |
+| POST | `/submission/algo` | Submit algorithm; `multipart/form-data`, field `file` |
+| GET | `/submissions/algo/{submissionId}/zip` | Get presigned S3 URL for results zip |
+| GET | `/submissions/algo/{submissionId}/graph` | Get presigned S3 URL for graph |
+| GET | `/results/round/{roundId}/algo/zip` | Round results zip |
 
-## Expected Behavior
+## Submission Status Values
 
-Once authenticated:
-1. Upload `trader.py` or similar algorithm file
-2. Poll for status until complete
-3. Download result log
-4. Open visualizer
+`SIMULATING` → `FINISHED` | `ERROR` | `ERROR_FINISHED` | `TIMEOUT`
 
-## Placeholder Constants (until endpoints found)
+## Submission Object Shape (from Zod schema in JS bundle)
 
-```python
-BASE_URL = "https://prosperity.imc.com"
-AUTH_ENDPOINT = "/api/???"  # TBD
-SUBMIT_ENDPOINT = "/api/???"  # TBD
-STATUS_ENDPOINT = "/api/???"  # TBD
-LOG_ENDPOINT = "/api/???"  # TBD
+```json
+{
+  "id": "uuid",
+  "teamId": "string",
+  "roundId": "string",
+  "status": "SIMULATING | FINISHED | ERROR | ERROR_FINISHED | TIMEOUT",
+  "submittedAt": "ISO datetime",
+  "submittedBy": { "firstName": "string", "lastName": "string" }
+}
 ```
