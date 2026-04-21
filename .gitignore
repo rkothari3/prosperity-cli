@@ -5,3 +5,10 @@ dist/
 build/
 .eggs/
 *.egg
+.venv/
+.env
+*.log
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage

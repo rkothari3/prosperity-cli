@@ -11,7 +11,6 @@ dependencies = [
     "typer>=0.12",
     "rich>=13",
     "requests>=2.31",
-    "prosperity4bt",
 ]
 
 [project.scripts]
