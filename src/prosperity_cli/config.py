@@ -1,6 +1,5 @@
 import json
 import typer
-from datetime import datetime
 from pathlib import Path
 from rich.prompt import Prompt
 from rich import print as rprint
@@ -26,7 +25,7 @@ def save(data: dict) -> None:
 def run(
     show: bool = typer.Option(False, "--show", help="Print current config path"),
 ):
-    """Configure email, password, and round deadline."""
+    """Configure email and password for IMC Prosperity."""
     if show:
         rprint(f"Config at: [cyan]{CONFIG_PATH}[/cyan]")
         return
@@ -55,34 +54,6 @@ def run(
         rprint("[red]Error:[/red] Password cannot be empty.")
         raise typer.Exit(1)
 
-    deadline = Prompt.ask(
-        "[cyan]Round deadline[/cyan] (YYYY-MM-DD HH:MM, optional)",
-        default=existing.get("deadline", ""),
-    )
-
-    visualizer_path = Prompt.ask(
-        "[cyan]Visualizer path[/cyan] (optional, e.g. ~/IMC_P4_Visualizer)",
-        default=existing.get("visualizer_path", ""),
-    )
-
     data = {"email": email, "password": password}
-    if deadline.strip():
-        try:
-            datetime.strptime(deadline.strip(), "%Y-%m-%d %H:%M")
-        except ValueError:
-            rprint("[red]Error:[/red] Deadline must be in YYYY-MM-DD HH:MM format.")
-            raise typer.Exit(1)
-        data["deadline"] = deadline.strip()
-
-    if visualizer_path.strip():
-        path = Path(visualizer_path.strip()).expanduser()
-        if not path.exists():
-            rprint("[red]Error:[/red] Visualizer path does not exist.")
-            raise typer.Exit(1)
-        if not (path / "package.json").exists():
-            rprint("[red]Error:[/red] No package.json found in visualizer path.")
-            raise typer.Exit(1)
-        data["visualizer_path"] = str(path)
-
     save(data)
     rprint("[green]✓[/green] Config saved.")

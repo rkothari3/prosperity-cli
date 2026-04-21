@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from typer.testing import CliRunner
 from prosperity_cli.cli import app
 
@@ -12,21 +12,18 @@ def test_visualize_missing_log_file():
     assert "not found" in result.output.lower()
 
 
-def test_visualize_missing_visualizer_dir(tmp_path):
-    with patch("prosperity_cli.visualize._find_visualizer", return_value=None):
+def test_visualize_opens_browser():
+    with patch("prosperity_cli.visualize.webbrowser.open") as mock_open:
         result = runner.invoke(app, ["visualize"])
-    assert result.exit_code != 0
-    assert "not found" in result.output.lower() or "config" in result.output.lower()
-
-
-def test_visualize_port_option(tmp_path):
-    vis_dir = tmp_path / "IMC_P4_Visualizer"
-    vis_dir.mkdir()
-    (vis_dir / "package.json").write_text("{}")
-
-    with patch("prosperity_cli.visualize._find_visualizer", return_value=vis_dir):
-        with patch("prosperity_cli.visualize.subprocess.Popen") as mock_popen:
-            with patch("prosperity_cli.visualize.webbrowser.open"):
-                mock_popen.return_value = MagicMock()
-                result = runner.invoke(app, ["visualize", "--port", "3000"])
     assert result.exit_code == 0
+    mock_open.assert_called_once()
+    assert "imc-prosperity-4-visualizer.vercel.app" in mock_open.call_args[0][0]
+
+
+def test_visualize_prints_log_path(tmp_path):
+    log = tmp_path / "result.log"
+    log.write_text("data")
+    with patch("prosperity_cli.visualize.webbrowser.open"):
+        result = runner.invoke(app, ["visualize", str(log)])
+    assert result.exit_code == 0
+    assert str(log.resolve()) in result.output

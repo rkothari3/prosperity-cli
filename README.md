@@ -5,15 +5,14 @@ Unified CLI for IMC Prosperity 4 trading competition: backtest, visualize, and s
 ## Prerequisites
 
 - Python 3.11+
-- [prosperity4btest](https://github.com/your-backtester-repo) installed (`pip install -e IMC_P4_Backtester/`)
-- [IMC_P4_Visualizer](https://github.com/your-visualizer-repo) cloned
-- Node.js + pnpm (for visualizer)
 
 ## Install
 
 ```bash
 pip install prosperity-cli
 ```
+
+This also installs `imc-p4-bt` (the backtester) as a dependency — no extra cloning needed.
 
 Or for development:
 
@@ -30,7 +29,7 @@ Run the interactive setup to save your credentials:
 prosperity config
 ```
 
-Enter your IMC email, password, round deadline, and visualizer path when prompted.
+Enter your IMC email and password when prompted.
 
 **Note:** Credentials are stored in `~/.prosperity/config.json` with restricted permissions (600).
 
@@ -47,26 +46,26 @@ prosperity backtest trader.py 1 2 3 --vis --merge-pnl
 
 Options:
 - `algorithm` — Path to your trader.py file
-- `rounds` — Round numbers to backtest
-- `--vis` — Show visualization
+- `rounds` — Round numbers to backtest (e.g. `1`, `1 2 3`, `1-0`)
+- `--vis` — Open the visualizer after backtest
 - `--merge-pnl` — Merge PnL across rounds
-- `--print` — Print output to console
+- `--print` — Print trader output to console
 - `--out <file>` — Write output to file
 - `--no-out` — Suppress output files
 
 ### prosperity visualize
 
-Launch the visualizer in your browser:
+Open the visualizer in your browser:
 
 ```bash
 prosperity visualize
 prosperity visualize result.log
-prosperity visualize --port 3000
 ```
 
+Opens [https://imc-prosperity-4-visualizer.vercel.app/](https://imc-prosperity-4-visualizer.vercel.app/) — paste or load your log file there to analyze results.
+
 Options:
-- `log_file` — Log file to load (shown as reminder to drag-and-drop)
-- `--port, -p` — Port to run on (default: 5173)
+- `log_file` — (Optional) Prints the log path as a reminder to load it in the UI
 
 ### prosperity submit
 
@@ -74,21 +73,19 @@ Submit your algorithm to IMC Prosperity, wait for results, and open visualizer:
 
 ```bash
 prosperity submit trader.py
-prosperity submit trader.py --no-vis --port 3000
+prosperity submit trader.py --no-vis
 ```
 
 This command:
 1. Authenticates with IMC Prosperity
 2. Uploads your algorithm
 3. Polls for results
-4. Downloads the log file
+4. Downloads the log file to `backtests/`
 5. Opens the visualizer
-
-**Note:** Endpoint discovery in progress — may need manual API capture.
 
 ### prosperity config
 
-Configure your credentials and settings:
+Configure your credentials:
 
 ```bash
 prosperity config          # Interactive prompts
@@ -97,12 +94,12 @@ prosperity config --show  # Show config path
 
 ## Countdown Timer
 
-If a deadline is configured, `prosperity` shows a countdown panel on each command:
+`prosperity` shows a countdown panel on every command during active rounds or intermission:
 
 ```
-╭───────────────────────────────╮
-│  Round ends in  2d 05h 12m 43s │
-╰───────────────────────────────╯
+╭───────────────────────────────────╮
+│  Intermission ends in  2d 05h 12m 43s │
+╰───────────────────────────────────╯
 ```
 
 ## Contributing

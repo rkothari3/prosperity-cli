@@ -12,6 +12,7 @@ from rich.live import Live
 from rich.text import Text
 
 from prosperity_cli.config import load as load_config, save as save_config
+from prosperity_cli.timer import is_intermission, intermission_end
 
 console = Console()
 
@@ -116,9 +117,14 @@ def _download_log(token: str, submission_id: str, dest: Path) -> Path:
 def run(
     algorithm: Path = typer.Argument(..., help="Path to trader.py"),
     no_vis: bool = typer.Option(False, "--no-vis", help="Skip visualizer after submit"),
-    port: int = typer.Option(5173, "--port", help="Visualizer port"),
 ):
     """Submit algorithm to IMC Prosperity, wait for results, open visualizer."""
+    if is_intermission():
+        end = intermission_end()
+        rprint("[yellow]Submissions are closed during Intermission.[/yellow]")
+        rprint(f"[dim]Round 3 opens {end.strftime('%A %d %B %Y at %H:%M CEST')}.[/dim]")
+        raise typer.Exit(0)
+
     cfg = load_config()
     if not cfg.get("email") or not cfg.get("password"):
         rprint("[red]Error:[/red] No credentials configured. Run: prosperity config")
@@ -186,4 +192,4 @@ def run(
 
     if not no_vis:
         from prosperity_cli import visualize
-        visualize.run(log_file=log_path if log_path.exists() else None, port=port)
+        visualize.run(log_file=log_path if log_path.exists() else None)

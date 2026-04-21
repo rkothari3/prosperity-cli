@@ -35,6 +35,23 @@ def get_current_countdown() -> Text | None:
     return None
 
 
+def is_intermission() -> bool:
+    """Return True if the current time falls within the Intermission window."""
+    now = datetime.now(tz=CEST)
+    for label, start, end in SCHEDULE:
+        if label == "Intermission" and start <= now < end:
+            return True
+    return False
+
+
+def intermission_end() -> datetime:
+    """Return the end datetime of the Intermission period."""
+    for label, _, end in SCHEDULE:
+        if label == "Intermission":
+            return end
+    raise RuntimeError("No intermission in schedule")
+
+
 def format_countdown(deadline_str: str) -> Text | None:
     """Fallback: format countdown from a manually configured deadline string (YYYY-MM-DD HH:MM)."""
     try:
