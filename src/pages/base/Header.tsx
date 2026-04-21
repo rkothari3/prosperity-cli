@@ -1,5 +1,5 @@
 import { Box, Container, Group, Text, Tooltip } from '@mantine/core';
-import { IconEye, IconHome } from '@tabler/icons-react';
+import { IconBrandGithub, IconEye, IconHome } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '../../store.ts';
@@ -58,7 +58,31 @@ export function Header(): ReactNode {
           IMC Prosperity 4 Visualizer
         </Text>
 
-        <Group gap={5}>{links}</Group>
+        <Group gap={5}>
+          {links}
+          <Tooltip label="rkothari3 — this fork" position="bottom">
+            <a
+              href="https://github.com/rkothari3"
+              target="_blank"
+              rel="noreferrer"
+              className={classes.link}
+              aria-label="rkothari3 on GitHub"
+            >
+              <IconBrandGithub size={18} />
+            </a>
+          </Tooltip>
+          <Tooltip label="jmerle — original creator" position="bottom">
+            <a
+              href="https://github.com/jmerle"
+              target="_blank"
+              rel="noreferrer"
+              className={classes.link}
+              aria-label="jmerle on GitHub"
+            >
+              <IconBrandGithub size={18} style={{ opacity: 0.55 }} />
+            </a>
+          </Tooltip>
+        </Group>
       </Container>
     </header>
   );
