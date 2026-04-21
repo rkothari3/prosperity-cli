@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prosperity-cli"
+version = "0.1.0"
+description = "Unified CLI for IMC Prosperity: backtest, visualize, and submit"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13",
+    "requests>=2.31",
+    "prosperity4bt",
+]
+
+[project.scripts]
+prosperity = "prosperity_cli.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prosperity_cli"]
